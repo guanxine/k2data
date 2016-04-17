@@ -1,0 +1,73 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:aop="http://www.springframework.org/schema/aop" xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+                     http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+                     http://www.springframework.org/schema/context
+                     http://www.springframework.org/schema/context/spring-context-4.0.xsd
+                     http://www.springframework.org/schema/aop
+                     http://www.springframework.org/schema/aop/spring-aop-4.0.xsd
+                     http://www.springframework.org/schema/tx
+                     http://www.springframework.org/schema/tx/spring-tx-4.0.xsd">
+
+
+
+    <!-- 组件扫描-->
+    <context:component-scan base-package="cn.gx.*" />
+    <!-- 分散配置 -->
+    <context:property-placeholder location="/WEB-INF/db/db.properties"/>
+    <!-- 数据源 -->
+    <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+        <!-- 连接数据库 -->
+        <property name="driverClass" value="${jdbc.driverclass}"></property>
+        <property name="jdbcUrl" value="${jdbc.url}"></property>
+        <property name="user" value="${jdbc.username}"></property>
+        <property name="password" value="${jdbc.password}"></property>
+        <!-- 数据源大小参数-->
+        <property name="maxPoolSize" value="${c3p0.pool.size.max}"></property>
+        <property name="minPoolSize" value="${c3p0.pool.size.min}"></property>
+        <property name="initialPoolSize" value="${c3p0.pool.size.init}"></property>
+        <property name="acquireIncrement" value="${c3p0.pool.size.increment}"></property>
+    </bean>
+
+
+
+
+
+    <!-- 事务管理，在 Service 实现事物管理，而且达到平台无关性：提供接口,具体由持久化框架实现-->
+    <bean id="txManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource"></property>
+    </bean>
+
+    <!-- 配置事物通知 -->
+    <tx:advice id="txAdvice" transaction-manager="txManager">
+        <tx:attributes>
+            <!-- 写操作 -->
+            <tx:method name="save*" propagation="REQUIRED" isolation="DEFAULT"/>
+            <tx:method name="update*" propagation="REQUIRED" isolation="DEFAULT"/>
+            <tx:method name="delete*" propagation="REQUIRED" isolation="DEFAULT"/>
+            <tx:method name="batch*" propagation="REQUIRED" isolation="DEFAULT"/>
+            <tx:method name="new*" propagation="REQUIRED" isolation="DEFAULT"/>
+
+            <!-- 读操作 -->
+            <tx:method name="get*" propagation="REQUIRED" isolation="DEFAULT" read-only="true"/>
+            <tx:method name="load*" propagation="REQUIRED" isolation="DEFAULT" read-only="true"/>
+            <tx:method name="find*" propagation="REQUIRED" isolation="DEFAULT" read-only="true"/>
+
+            <tx:method name="*" propagation="REQUIRED" isolation="DEFAULT"/>
+        </tx:attributes>
+    </tx:advice>
+    <!-- aop配置 -->
+    <aop:config >
+
+        <aop:advisor advice-ref="txAdvice" pointcut="execution(* *..*Service.*(..))"/>
+    </aop:config>
+
+
+    <bean class="org.springframework.web.client.RestTemplate">
+        <property name="errorHandler">
+            <bean class="cn.gx.exception.MyResponseErrorHandler" />
+        </property>
+    </bean>
+
+</beans>
