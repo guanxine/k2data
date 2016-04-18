@@ -37,7 +37,7 @@ public interface CoursesService {
      *
      */
 
-    public Course saveCourse(CourseView courseView)  throws Exception;
+    public Course saveCourse(CourseView courseView)  throws RuntimeException;
 
     /**
      * 课程是否存在

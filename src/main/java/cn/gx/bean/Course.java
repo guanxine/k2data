@@ -11,7 +11,7 @@ import java.util.Date;
  *
  * 持久化数据库的 课程实体类
  */
-public class Course implements Serializable,Validable{
+public class Course implements Serializable{
 
 
     private Integer id;
@@ -78,21 +78,5 @@ public class Course implements Serializable,Validable{
 
 
         this.facilitator = facilitator;
-    }
-
-    @Override
-    public boolean isVaild() {
-        /**
-         *
-         private Integer id;
-         private String name;
-         private Date start;
-         private Date end;
-         private Integer estimatedTime;
-         private String facilitator;
-         */
-
-//        return title != null && !title.isEmpty() && !categories.isEmpty();
-        return false;
     }
 }

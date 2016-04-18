@@ -1,9 +1,13 @@
 package cn.gx.entity;
 
+import org.hibernate.validator.constraints.NotBlank;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.validation.Errors;
 import org.springframework.validation.ValidationUtils;
 import org.springframework.validation.Validator;
 
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 
 /**
@@ -11,15 +15,16 @@ import javax.validation.constraints.NotNull;
  *
  * 返回给客户端的课程信息
  */
+
 public class CourseView {
 
-    @NotNull
+//    @NotBlank(message = "课程名称不能为空")
     private String name;
-    @NotNull
+//    @NotNull(message="课程时间不能为空")
     private Time time;
-    @NotNull
+//    @NotNull
     private Integer estimatedTime;
-    @NotNull
+//    @NotNull
     private String facilitator;
 
     private Link link;

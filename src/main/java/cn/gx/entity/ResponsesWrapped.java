@@ -1,5 +1,8 @@
 package cn.gx.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import org.springframework.http.HttpStatus;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -23,7 +26,7 @@ public class ResponsesWrapped {
     /**
      * 响应状态码
      */
-    private int code;
+    private HttpStatus code;
     /**
      * 响应的值
      * success:
@@ -41,15 +44,13 @@ public class ResponsesWrapped {
      */
     private Map<String,Object> data= new HashMap<>();
 
-
-    public int getCode() {
+    public HttpStatus getCode() {
         return code;
     }
 
-    public void setCode(int code) {
+    public void setCode(HttpStatus code) {
         this.code = code;
     }
-
 
     public Status getStatus() {
         return status;
