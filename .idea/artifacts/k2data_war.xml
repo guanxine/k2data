@@ -1,8 +1,0 @@
-<component name="ArtifactManager">
-  <artifact type="war" name="k2data:war">
-    <output-path>$PROJECT_DIR$/target</output-path>
-    <root id="archive" name="k2DataCoursesRestService.war">
-      <element id="artifact" artifact-name="k2data:war exploded" />
-    </root>
-  </artifact>
-</component>
