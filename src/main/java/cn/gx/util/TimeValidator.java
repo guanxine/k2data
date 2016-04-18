@@ -29,7 +29,8 @@ public class TimeValidator implements Validator {
 
         Time time=(Time)target;
 
-        if (time.isVaild()){
+        if (!time.isVaild()){
+            System.out.println(this.getClass().getSimpleName());
             errors.rejectValue("start","start less end");
             errors.rejectValue("end","end great start");
         }

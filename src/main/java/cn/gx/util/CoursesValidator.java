@@ -50,15 +50,5 @@ public class CoursesValidator implements Validator {
         } finally {
             errors.popNestedPath();
         }
-
-
-
-        if (cv.getTime().isVaild()){
-            errors.rejectValue("time.start","start less end");
-            errors.rejectValue("time.end","end great start");
-        }
-
-
-
     }
 }
