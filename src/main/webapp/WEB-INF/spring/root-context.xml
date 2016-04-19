@@ -63,11 +63,4 @@
         <aop:advisor advice-ref="txAdvice" pointcut="execution(* *..*Service.*(..))"/>
     </aop:config>
 
-
-    <bean class="org.springframework.web.client.RestTemplate">
-        <property name="errorHandler">
-            <bean class="cn.gx.exception.MyResponseErrorHandler" />
-        </property>
-    </bean>
-
 </beans>

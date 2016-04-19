@@ -1,9 +1,10 @@
 package cn.gx.entity;
 
-import cn.gx.util.DatePattern;
-import org.springframework.format.annotation.DateTimeFormat;
+import cn.gx.util.CustomDateDeserializer;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-import javax.validation.constraints.NotNull;
 import java.util.Date;
 
 /**
@@ -11,12 +12,12 @@ import java.util.Date;
  */
 //@FieldCompare(first = "start", second = "end", message = "start 应该小于 second")
 public class Time {
-
-//    @NotNull
-//    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+    @JsonDeserialize(using = CustomDateDeserializer.class)
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     public Date start;
-//    @NotNull
-//    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+
+    @JsonDeserialize(using = CustomDateDeserializer.class)
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     public Date end;
 
 
@@ -36,9 +37,19 @@ public class Time {
         this.end = end;
     }
 
+    @JsonIgnore
     public boolean isVaild(){
 
-        return start!=null&&end!=null&&start.getTime()<end.getTime();
+        return start!=null&&end!=null&&start.getTime()<=end.getTime();
+    }
+
+
+    @Override
+    public String toString() {
+        return "Time{" +
+                "start=" + start +
+                ", end=" + end +
+                '}';
     }
 }
 

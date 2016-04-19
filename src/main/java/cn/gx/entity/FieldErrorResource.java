@@ -1,8 +1,11 @@
 package cn.gx.entity;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
 /**
  * Created by guanxine on 16-4-17.
  */
+@JsonSerialize(include= JsonSerialize.Inclusion.NON_EMPTY)
 public class FieldErrorResource {
 
     private String resource;

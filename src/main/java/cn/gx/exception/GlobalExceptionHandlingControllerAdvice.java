@@ -1,12 +1,11 @@
 package cn.gx.exception;
 
-import cn.gx.entity.ErrorInfo;
 import cn.gx.entity.ErrorResource;
 import cn.gx.entity.FieldErrorResource;
+import cn.gx.entity.Link;
 import cn.gx.entity.ResponsesWrapped;
-import com.fasterxml.jackson.core.JsonParseException;
+import cn.gx.util.CustomDateDeserializer;
 import com.fasterxml.jackson.databind.JsonMappingException;
-import com.mysql.jdbc.MysqlDataTruncation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
@@ -14,18 +13,16 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.NoHandlerFoundException;
-import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import javax.servlet.http.HttpServletRequest;
 import java.sql.SQLException;
@@ -44,42 +41,6 @@ public class GlobalExceptionHandlingControllerAdvice{
         logger = LoggerFactory.getLogger(getClass());
     }
 
-	/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-	/* . . . . . . . . . . . . . EXCEPTION HANDLERS . . . . . . . . . . . . . . */
-	/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-
-    /**
-     * Convert a predefined exception to an HTTP Status code
-     */
-//    @ResponseStatus(value = HttpStatus.CONFLICT, reason = "Data integrity violation")
-//    // 409
-//    @ExceptionHandler(DataIntegrityViolationException.class)
-//    public ResponsesWrapped conflict(Exception exception) {
-//        // Nothing to do. Return value 'databaseError' used as logical view name
-//        // of an error page, passed to view-resolver(s) in usual way.
-//
-//        ResponsesWrapped responsesWrapped=new ResponsesWrapped();
-//        responsesWrapped.setCode(HttpStatus.CONFLICT);
-//        responsesWrapped.setMessage(exception.getLocalizedMessage());
-//        responsesWrapped.setStatus(ResponsesWrapped.Status.fail);
-//
-//        logger.error("Request raised " + exception.getClass().getSimpleName());
-//        return responsesWrapped;
-//    } @ResponseStatus(value = HttpStatus.CONFLICT, reason = "Data integrity violation")
-//    // 409
-//    @ExceptionHandler(DataIntegrityViolationException.class)
-//    public ResponsesWrapped conflict(Exception exception) {
-//        // Nothing to do. Return value 'databaseError' used as logical view name
-//        // of an error page, passed to view-resolver(s) in usual way.
-//
-//        ResponsesWrapped responsesWrapped=new ResponsesWrapped();
-//        responsesWrapped.setCode(HttpStatus.CONFLICT);
-//        responsesWrapped.setMessage(exception.getLocalizedMessage());
-//        responsesWrapped.setStatus(ResponsesWrapped.Status.fail);
-//
-//        logger.error("Request raised " + exception.getClass().getSimpleName());
-//        return responsesWrapped;
-//    }
 
     /**
      * Convert a predefined exception to an HTTP Status code and specify the
@@ -91,85 +52,35 @@ public class GlobalExceptionHandlingControllerAdvice{
     @ExceptionHandler({ DataIntegrityViolationException.class,SQLException.class,DataAccessException.class})
     @ResponseBody
     public ResponsesWrapped databaseError(Exception exception) {
-        // Nothing to do. Return value 'databaseError' used as logical view name
-        // of an error page, passed to view-resolver(s) in usual way.
 
         ResponsesWrapped responsesWrapped=new ResponsesWrapped();
         responsesWrapped.setCode(HttpStatus.CONFLICT);
         responsesWrapped.setStatus(ResponsesWrapped.Status.error);
+
         Throwable cause = exception.getCause();
         if (cause instanceof SQLException){
             SQLException sqlEx= (SQLException) cause;
-            responsesWrapped.setData("message",sqlEx.getMessage());
-            responsesWrapped.setData("SQLState",sqlEx.getSQLState());
+            responsesWrapped.setMessage(String.format("msg:%s,SQLState:%s,cause:%s",sqlEx.getMessage(),sqlEx.getSQLState(),cause.getClass().getSimpleName()));
+        }else{
+            responsesWrapped.setMessage(cause.getLocalizedMessage());
         }
-
-        responsesWrapped.setData("cause", cause.getClass().getSimpleName());
 
         logger.error("Request raised " + exception.getClass().getSimpleName());
         return responsesWrapped;
     }
 
-
-//    /**
-//     * Demonstrates how to take total control - setup a model, add useful
-//     * information and return the "support" view name. This method explicitly
-//     * creates and returns
-//     *
-//     * @param req
-//     *            Current HTTP request.
-//     * @param exception
-//     *            The exception thrown - always {@link SupportInfoException}.
-//     * @return The model and view used by the DispatcherServlet to generate
-//     *         output.
-//     * @throws Exception
-//     */
-//    @ExceptionHandler(SupportInfoException.class)
-//    public ModelAndView handleError(HttpServletRequest req, Exception exception)
-//            throws Exception {
-//
-//        // Rethrow annotated exceptions or they will be processed here instead.
-//        if (AnnotationUtils.findAnnotation(exception.getClass(),
-//                ResponseStatus.class) != null)
-//            throw exception;
-//
-//        logger.error("Request: " + req.getRequestURI() + " raised " + exception);
-//
-//        ModelAndView mav = new ModelAndView();
-//        mav.addObject("exception", exception);
-//        mav.addObject("url", req.getRequestURL());
-//        mav.addObject("timestamp", new Date().toString());
-//        mav.addObject("status", 500);
-//
-//        mav.setViewName("support");
-//        return mav;
-//    }
-
-//
-//    @ResponseStatus(HttpStatus.BAD_REQUEST)
-//    @ExceptionHandler(HttpMessageNotReadableException.class)
-//    @ResponseBody ErrorInfo handleHttpMessageNotReadableException(HttpServletRequest req, Exception ex) {
-//        //logger.error(ex.getLocalizedMessage());
-//        logger.error(ex.getClass().getTypeName());
-//        return new ErrorInfo(req.getRequestURL().toString(), ex);
-//    }
-
-    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler(Exception.class)
-    @ResponseBody ErrorInfo handleException(HttpServletRequest req, Exception ex) {
-        //logger.error(ex.getLocalizedMessage());
-        logger.error(ex.getClass().getName());
-        return new ErrorInfo(req.getRequestURL().toString(), ex);
-    }
+    @ResponseBody ResponsesWrapped handleException(HttpServletRequest req, Exception ex) {
+        ResponsesWrapped responsesWrapped=new ResponsesWrapped();
+        responsesWrapped.setCode(HttpStatus.INTERNAL_SERVER_ERROR);
+        responsesWrapped.setStatus(ResponsesWrapped.Status.fail);
+        responsesWrapped.setMessage(ex.getLocalizedMessage());
+        responsesWrapped.setLink(new Link(req.getRequestURL().toString()));
+        logger.error("Request raised " + ex.getClass().getSimpleName());
 
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    @ExceptionHandler(NoHandlerFoundException.class)
-    @ResponseBody ErrorInfo handleNoHandlerFoundException(HttpServletRequest req, Exception ex) {
-        //logger.error(ex.getLocalizedMessage());
-        logger.error(ex.getClass().getTypeName());
-        return new ErrorInfo(req.getRequestURL().toString(), ex);
+        return responsesWrapped;
     }
-
 
 
 
@@ -180,7 +91,7 @@ public class GlobalExceptionHandlingControllerAdvice{
 
         BindingResult bindingResult = ex.getBindingResult();
         String errorMesssage = "Invalid Request:\n";
-        List<FieldErrorResource> fieldErrorResources = new ArrayList<>();
+        List<FieldErrorResource> fieldErrorResources = new ArrayList<FieldErrorResource>();
 
         List<FieldError>  fieldErrors= bindingResult.getFieldErrors();
         for (FieldError fieldError : fieldErrors) {
@@ -203,29 +114,41 @@ public class GlobalExceptionHandlingControllerAdvice{
 
 
     // json 格式错误
+    // 日期格式错了
+    //
     @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
-    @ExceptionHandler(HttpMessageNotReadableException.class)
+    @ExceptionHandler({HttpMessageNotReadableException.class,JsonMappingException.class})
     @ResponseBody
-    ErrorInfo handleHttpMessageNotReadableException(HttpServletRequest req, Exception ex) {
+    ResponsesWrapped handleHttpMessageNotReadableException(HttpServletRequest req, Exception ex) {
+        ResponsesWrapped responsesWrapped=new ResponsesWrapped();
+        responsesWrapped.setCode(HttpStatus.UNPROCESSABLE_ENTITY);
+        responsesWrapped.setStatus(ResponsesWrapped.Status.error);
+        Throwable cause = ex.getCause();
+        if (cause instanceof JsonMappingException){
+            JsonMappingException jsonEx= (JsonMappingException) cause;
+            responsesWrapped.setMessage(jsonEx.getLocalizedMessage());
+        }else {
+            responsesWrapped.setMessage(ex.getMessage());
+        }
 
-        logger.error(ex.getClass().getName());
-        logger.error(ex.getLocalizedMessage());
-        return new ErrorInfo(req.getRequestURL().toString(), ex);
+        responsesWrapped.setLink(new Link(req.getRequestURL().toString()));
+        logger.error("Request raised " + ex.getClass().getSimpleName());
+
+        return responsesWrapped;
     }
 
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    @ExceptionHandler(NotFoundException.class)
+    @ExceptionHandler({NotFoundException.class,HttpRequestMethodNotSupportedException.class,NoHandlerFoundException.class})
     @ResponseBody
-    ErrorInfo handleBadRequest(HttpServletRequest req, Exception ex) {
-        logger.error(ex.getLocalizedMessage());
-        return new ErrorInfo(req.getRequestURL().toString(), ex);
-    }
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    @ExceptionHandler(JsonMappingException.class)
-    @ResponseBody
-    ErrorInfo handleJsonMappingException(HttpServletRequest req, Exception ex) {
-        logger.error(ex.getLocalizedMessage());
-        return new ErrorInfo(req.getRequestURL().toString(), ex);
+    ResponsesWrapped handleBadRequest(HttpServletRequest req, Exception ex) {
+
+        ResponsesWrapped responsesWrapped=new ResponsesWrapped();
+        responsesWrapped.setCode(HttpStatus.NOT_FOUND);
+        responsesWrapped.setStatus(ResponsesWrapped.Status.error);
+        responsesWrapped.setMessage(ex.getLocalizedMessage());
+        responsesWrapped.setLink(new Link(req.getRequestURL().toString()));
+        logger.error("Request raised " + ex.getClass().getSimpleName());
+        return responsesWrapped;
     }
 
 

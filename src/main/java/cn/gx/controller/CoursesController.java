@@ -2,27 +2,30 @@ package cn.gx.controller;
 
 import cn.gx.bean.Course;
 import cn.gx.entity.CourseView;
-import cn.gx.exception.InvalidRequestException;
-import cn.gx.exception.NotFoundException;
+import cn.gx.entity.Link;
+import cn.gx.entity.ResponsesWrapped;
 import cn.gx.service.CoursesService;
-import cn.gx.util.CoursesValidator;
-import cn.gx.util.TimeValidator;
+import cn.gx.validation.CoursesValidator;
+import cn.gx.validation.TimeValidator;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+import java.net.URI;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import static cn.gx.util.CoursesAPIHelper.*;
 
 /**
  * Created by guanxine on 16-4-17.
@@ -35,19 +38,9 @@ public class CoursesController {
     @Autowired
     CoursesService coursesService;
 
-    public static final String GET_COURSE = "/courses/{id}";
-    public static final String GET_ALL_COURSES = "/courses";
-    public static final String CREATE_COURSE = "/courses";
-    public static final String DELETE_COURSE = "/courses/{id}";
-
 
     @InitBinder
     public void initBinder(WebDataBinder binder) {
-        //添加一个日期类型编辑器，也就是需要日期类型的时候，怎么把字符串转化为日期类型
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        dateFormat.setLenient(false);
-        binder.registerCustomEditor(Date.class, new CustomDateEditor(dateFormat, true));
-        //添加一个spring自带的validator
         binder.setValidator(new CoursesValidator(new TimeValidator()));
     }
 
@@ -55,30 +48,47 @@ public class CoursesController {
 
     //-------------------Retrieve All Users--------------------------------------------------------
 
-    @RequestMapping(value = GET_ALL_COURSES, method = RequestMethod.GET)
+    @RequestMapping(value =GET_ALL_COURSES,method = RequestMethod.GET)
     public ResponseEntity<List<CourseView>> listAllCourses(HttpServletRequest request) {
 
-        String path = request.getServletPath();
-        List<CourseView>  courses = coursesService.findAllCourses(path);
-        if(courses.isEmpty()){
-            return new ResponseEntity<List<CourseView>>(HttpStatus.NO_CONTENT);//You many decide to return HttpStatus.NOT_FOUND
-        }
-        return new ResponseEntity<List<CourseView>>(courses, HttpStatus.OK);
+        String href = request.getRequestURL().toString();
+        List<CourseView>  courses = coursesService.findAllCourses(href);
+        ResponsesWrapped responsesWrapped=new ResponsesWrapped();
+
+        responsesWrapped.setCode(HttpStatus.OK);
+        responsesWrapped.setStatus(ResponsesWrapped.Status.success);
+        responsesWrapped.setMessage("查询课程列表成功");
+
+        Map<String,Object> objectMap=new HashMap<String,Object>();
+        objectMap.put("courses",courses);
+        objectMap.put("info",responsesWrapped);
+
+        return new ResponseEntity(objectMap, HttpStatus.OK);
     }
 
     //-------------------Retrieve Single User--------------------------------------------------------
 
-    @RequestMapping(value = GET_COURSE, method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<CourseView> getUser(
-            @PathVariable("id") Integer id) {
-        System.out.println("Fetching User with id " + id);
-        CourseView course = coursesService.findById(id);
-        if (course == null) {
-            System.out.println("User with id " + id + " not found");
-            //return new ResponseEntity<CourseView>(HttpStatus.NOT_FOUND);
-            throw new NotFoundException(id);
-        }
-        return new ResponseEntity<CourseView>(course, HttpStatus.OK);
+    @RequestMapping(
+            value = GET_COURSE,
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<CourseView> getCourse(
+            @PathVariable("id") Integer id,
+            HttpServletRequest request) {
+
+        String href = request.getRequestURL().toString();
+        CourseView course = coursesService.findById(id,href);
+
+        ResponsesWrapped responsesWrapped=new ResponsesWrapped();
+
+        responsesWrapped.setCode(HttpStatus.OK);
+        responsesWrapped.setStatus(ResponsesWrapped.Status.success);
+        responsesWrapped.setMessage("查询课程成功");
+
+        Map<String,Object> objectMap=new HashMap<String,Object>();
+        objectMap.put("course",course);
+        objectMap.put("info",responsesWrapped);
+        return new ResponseEntity(objectMap, HttpStatus.OK);
     }
 
     //-------------------Create a User--------------------------------------------------------
@@ -87,41 +97,45 @@ public class CoursesController {
             value = CREATE_COURSE,
             method = RequestMethod.POST,
             produces =MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Void> createUser(
+    public ResponseEntity createCourse(
             UriComponentsBuilder ucBuilder,
             @RequestBody @Valid  CourseView courseView) {
 
-        System.out.println("Creating User " + courseView.getName());
 
         Course course=coursesService.saveCourse(courseView);
-//        try {
-//            course = coursesService.saveCourse(courseView);
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
+        URI href = ucBuilder.path("/courses/{id}").buildAndExpand(course.getId()).toUri();
+
         HttpHeaders headers = new HttpHeaders();
-        headers.setLocation(ucBuilder.path(GET_COURSE).buildAndExpand(course.getId()).toUri());
+        headers.setLocation(href);
+        ResponsesWrapped responsesWrapped=new ResponsesWrapped();
 
+        responsesWrapped.setCode(HttpStatus.OK);
+        responsesWrapped.setStatus(ResponsesWrapped.Status.success);
+        responsesWrapped.setMessage("创建课程成功");
 
+        responsesWrapped.setLink(new Link(href.toString()));
 
-        return new ResponseEntity<Void>(headers, HttpStatus.CREATED);
-
-
+        return new ResponseEntity(responsesWrapped,headers,HttpStatus.CREATED);
     }
 
     //------------------- Delete a User --------------------------------------------------------
 
-    @RequestMapping(value = DELETE_COURSE, method = RequestMethod.DELETE)
-    public ResponseEntity<CourseView> deleteUser(@PathVariable("id") Integer id) {
-        System.out.println("Fetching & Deleting User with id " + id);
+    @RequestMapping(
+            value =DELETE_COURSE,
+            method = RequestMethod.DELETE)
+    public ResponseEntity deleteCourse(
+            @PathVariable("id") Integer id,
+            HttpServletRequest request) {
 
-        if (!coursesService.isCourseExist(id)) {
-            System.out.println("Unable to delete. User with id " + id + " not found");
-            return new ResponseEntity<CourseView>(HttpStatus.NOT_FOUND);
-        }else {
-            coursesService.deleteCourseById(id);
-            return new ResponseEntity<CourseView>(HttpStatus.NO_CONTENT);
-        }
+        coursesService.deleteCourseById(id);
+        ResponsesWrapped responsesWrapped=new ResponsesWrapped();
+
+        responsesWrapped.setCode(HttpStatus.NO_CONTENT);
+        responsesWrapped.setStatus(ResponsesWrapped.Status.success);
+        responsesWrapped.setMessage("课程删除成功");
+        responsesWrapped.setLink(new Link(request.getRequestURI()));
+
+        return new ResponseEntity(responsesWrapped,HttpStatus.NO_CONTENT);
     }
 
 

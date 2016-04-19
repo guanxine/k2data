@@ -3,21 +3,13 @@ package cn.gx.service.impl;
 import cn.gx.bean.Course;
 import cn.gx.dao.CoursesDao;
 import cn.gx.entity.CourseView;
-import cn.gx.entity.ErrorResource;
 import cn.gx.entity.Link;
 import cn.gx.entity.Time;
-import cn.gx.exception.ServiceException;
 import cn.gx.service.CoursesService;
-import cn.gx.util.DataUtil;
-import com.sun.corba.se.impl.naming.namingutil.CorbalocURL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.validation.Errors;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -48,29 +40,21 @@ public class CoursesServiceImpl implements CoursesService{
     }
 
     public void deleteCourseById(Integer id) {
-        coursesDao.deleteById(id);
+        Course course = coursesDao.selectById(id);
+        coursesDao.deleteById(course.getId());
     }
 
-    public CourseView findById(Integer id) {
-
-
+    public CourseView findById(Integer id,String url) {
         Course course = coursesDao.selectById(id);
-        if (course!=null){
-            return copyProps(course);
-        }else{
-            return null;
-        }
+        CourseView courseView = copyProps(course);
+        courseView.setLink(new Link(url));
+        return courseView;
     }
 
 
     private CourseView copyProps(Course course) {
 
         Time time=new Time();
-//        time.setStart(sdf.format(course.getStart()));
-//        time.setEnd(sdf.format(course.getEnd()));
-
-
-        String format="yyyy-MM-dd";
         time.setStart(course.getStart());
         time.setEnd(course.getEnd());
 
@@ -85,10 +69,6 @@ public class CoursesServiceImpl implements CoursesService{
     public Course saveCourse(CourseView courseView) throws RuntimeException{
 
         Time time = courseView.getTime();
-//        if (!time.isVaild()){
-//            ErrorResource er=new ErrorResource();
-//            return ServiceException(,)
-//        }
         Course course=new Course();
         course.setName(courseView.getName());
         course.setStart(time.getStart());
@@ -98,14 +78,4 @@ public class CoursesServiceImpl implements CoursesService{
         return coursesDao.save(course);
     }
 
-    @Override
-    public boolean isCourseExist(Integer id) {
-
-        if (id!=null){
-            Course dbc = coursesDao.selectById(id);
-            return dbc==null?false:true;
-        }else{
-            return false;
-        }
-    }
 }

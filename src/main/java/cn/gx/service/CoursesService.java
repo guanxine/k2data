@@ -30,7 +30,7 @@ public interface CoursesService {
      * @return
      *
      */
-    public CourseView findById(Integer id);
+    public CourseView findById(Integer id,String url);
 
     /**
      * 创建课程
@@ -39,11 +39,5 @@ public interface CoursesService {
 
     public Course saveCourse(CourseView courseView)  throws RuntimeException;
 
-    /**
-     * 课程是否存在
-     *
-     * @param id
-     * @return
-     */
-    boolean isCourseExist(Integer id);
+
 }

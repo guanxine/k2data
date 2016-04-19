@@ -2,8 +2,10 @@ package cn.gx.dao.impl;
 
 import cn.gx.bean.Course;
 import cn.gx.dao.CoursesDao;
+import cn.gx.exception.NotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -11,6 +13,7 @@ import org.springframework.stereotype.Repository;
 
 import javax.annotation.Resource;
 import javax.sql.DataSource;
+import java.sql.*;
 import java.util.Collections;
 import java.util.List;
 
@@ -34,7 +37,7 @@ public class CoursesDaoImpl implements CoursesDao{
         List<Course> courses = jdbcTemplate.query(sql, courseRowMapper);
 
         if (courses==null || courses.isEmpty()){
-            return Collections.emptyList();
+            throw new NotFoundException("课程列表为空");
         }else{
             return courses;
         }
@@ -49,37 +52,47 @@ public class CoursesDaoImpl implements CoursesDao{
     public Course selectById(Integer id) {
         String sql="SELECT ID,NAME,START,END,ESTIMATEDTIME,FACILITATOR FROM courses WHERE ID=?";
         List<Course> courses = jdbcTemplate.query(sql, courseRowMapper, id);
-
         if (courses==null||courses.isEmpty()){
-            return null;
+            throw new NotFoundException(id);
         }else{
             return courses.get(0);
         }
 
     }
 
-    public Course save(Course course) {
-        KeyHolder keyHolder = new GeneratedKeyHolder();
-        String sql=" INSERT INTO courses (name,start,end,estimatedTime,facilitator) VALUES (?,?,?,?,?)";
-//        jdbcTemplate.update(con -> {
-//            PreparedStatement p = con.prepareStatement(sql, new String[]{"id"});
-//            return null;
-//        },keyHolder);
+    public Course save(final Course course) {
+        final String sql=" INSERT INTO courses (name,start,end,estimatedTime,facilitator) VALUES (?,?,?,?,?)";
 
-        jdbcTemplate.update(sql, course.getName(), course.getStart(), course.getEnd(), course.getEstimatedTime(), course.getFacilitator());
+        KeyHolder keyHolder=new GeneratedKeyHolder();
 
+        jdbcTemplate.update(new PreparedStatementCreator() {
+            public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
+                PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+                ps.setString(1,course.getName());
+                ps.setObject(2,course.getStart());
+                ps.setObject(3,course.getEnd());
+                ps.setInt(4,course.getEstimatedTime());
+                ps.setString(5,course.getFacilitator());
+                return ps;
+            }
+        }, keyHolder);
+        course.setId(keyHolder.getKey().intValue());
         return course;
     }
 
 
-    private RowMapper<Course> courseRowMapper=(rs,rowNum)->{
-        Course c=new Course();
-        c.setId(rs.getInt("id"));
-        c.setName(rs.getString("name"));
-        c.setStart(rs.getDate("start"));
-        c.setEnd(rs.getDate("end"));
-        c.setFacilitator(rs.getString("facilitator"));
-        c.setEstimatedTime(rs.getInt("estimatedTime"));
-        return c;
+    private RowMapper<Course> courseRowMapper=new RowMapper<Course>() {
+        public Course mapRow(ResultSet rs, int rowNum) throws SQLException {
+            Course c=new Course();
+            c.setId(rs.getInt("id"));
+            c.setName(rs.getString("name"));
+            c.setStart(rs.getDate("start"));
+            c.setEnd(rs.getDate("end"));
+            c.setFacilitator(rs.getString("facilitator"));
+            c.setEstimatedTime(rs.getInt("estimatedTime"));
+            return c;
+        }
     };
+
+
 }

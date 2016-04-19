@@ -1,11 +1,7 @@
 package cn.gx.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.springframework.http.HttpStatus;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
 
 /**
  * Created by guanxine on 16-4-16.
@@ -18,7 +14,17 @@ import java.util.Objects;
  * {"code":401,"status":"error","message":"token is invalid","data":"UnauthorizedException"}
  *
  */
+@JsonSerialize(include= JsonSerialize.Inclusion.NON_EMPTY)
 public class ResponsesWrapped {
+
+    /**
+     * 响应的值 信息
+     * success:
+     * fail:500~599
+     * error:400~499
+     */
+    private Status status;
+
 
     public enum Status{
         success,fail,error
@@ -28,21 +34,12 @@ public class ResponsesWrapped {
      */
     private HttpStatus code;
     /**
-     * 响应的值
-     * success:
-     * fail:500~599
-     * error:400~499
-     */
-    private Status status;
-    /**
      *  only used for “fail” and “error” statuses to contain the error message
      */
     private String message;
-    /**
-     *
-     *
-     */
-    private Map<String,Object> data= new HashMap<>();
+
+    private Link link;
+
 
     public HttpStatus getCode() {
         return code;
@@ -60,9 +57,6 @@ public class ResponsesWrapped {
         this.status = status;
     }
 
-    public void setData(Map<String, Object> data) {
-        this.data = data;
-    }
 
     public String getMessage() {
         return message;
@@ -72,11 +66,11 @@ public class ResponsesWrapped {
         this.message = message;
     }
 
-    public Object getData() {
-        return data;
+    public Link getLink() {
+        return link;
     }
 
-    public void setData(String key,Object value) {
-        data.put(key,value);
+    public void setLink(Link link) {
+        this.link = link;
     }
 }

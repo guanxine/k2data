@@ -1,4 +1,4 @@
-package cn.gx.util;
+package cn.gx.validation;
 
 import cn.gx.entity.CourseView;
 import cn.gx.entity.Time;
@@ -26,22 +26,18 @@ public class CoursesValidator implements Validator {
     }
 
 
-    @Override
     public boolean supports(Class<?> clazz) {
 
         return CourseView.class.isAssignableFrom(clazz);
     }
 
-    @Override
     public void validate(Object target, Errors errors) {
        // ValidationUtils.re
 
-        ValidationUtils.rejectIfEmptyOrWhitespace(errors,"name","not null","课程名称不能为空");
-        ValidationUtils.rejectIfEmptyOrWhitespace(errors,"time","not null","课程时间不能为空");
-        ValidationUtils.rejectIfEmptyOrWhitespace(errors,"estimatedTime","not null","课程课时不能为空");
-        ValidationUtils.rejectIfEmptyOrWhitespace(errors,"facilitator","not null","老师不能为空");
-        ValidationUtils.rejectIfEmptyOrWhitespace(errors,"time.start","not null","课程开始时间不能为空");
-        ValidationUtils.rejectIfEmptyOrWhitespace(errors,"time.end","not null","课程结束时间不能为空");
+        ValidationUtils.rejectIfEmptyOrWhitespace(errors,"name","notnull","name 不能为空");
+        ValidationUtils.rejectIfEmptyOrWhitespace(errors,"time","not null","time 不能为空");
+        ValidationUtils.rejectIfEmptyOrWhitespace(errors,"estimatedTime","not null","estimatedTime 不能为空");
+        ValidationUtils.rejectIfEmptyOrWhitespace(errors,"facilitator","not null","facilitator 不能为空");
 
         CourseView cv=(CourseView)target;
         try {

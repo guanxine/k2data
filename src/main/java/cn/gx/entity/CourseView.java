@@ -1,21 +1,13 @@
 package cn.gx.entity;
 
-import org.hibernate.validator.constraints.NotBlank;
-import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.validation.Errors;
-import org.springframework.validation.ValidationUtils;
-import org.springframework.validation.Validator;
-
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotNull;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 /**
  * Created by always on 16/4/14.
  *
  * 返回给客户端的课程信息
  */
-
+@JsonSerialize(include= JsonSerialize.Inclusion.NON_EMPTY)
 public class CourseView {
 
 //    @NotBlank(message = "课程名称不能为空")

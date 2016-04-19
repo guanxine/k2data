@@ -31,26 +31,11 @@
 
     <!-- Configure bean to convert JSON to POJO and vice versa -->
     <bean id="jsonMessageConverter" class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">
-
-        <!--<property name="objectMapper">-->
-            <!--&lt;!&ndash; <bean class="com.threeStepTech.ObjectMapper.CustomObjectMapper"/> &ndash;&gt;-->
-            <!--<bean class="com.fasterxml.jackson.databind.ObjectMapper">-->
-                <!--<property name="dateFormat">-->
-                    <!--<bean class="java.text.SimpleDateFormat">-->
-                        <!--<constructor-arg type="java.lang.String" value="yyyy-MM-dd" />-->
-                    <!--</bean>-->
-                <!--</property>-->
-                <!--<property name="serializationInclusion">-->
-                    <!--&lt;!&ndash; 注入枚举类型 &ndash;&gt;-->
-                    <!--<value type="com.fasterxml.jackson.annotation.JsonInclude.Include">NON_NULL</value>-->
-                <!--</property>-->
-            <!--</bean>-->
-        <!--</property>-->
-        <!--<property name="supportedMediaTypes">-->
-            <!--<list>-->
-                <!--<value>application/json;charset=UTF-8</value>-->
-            <!--</list>-->
-        <!--</property>-->
+        <property name="supportedMediaTypes">
+            <list>
+                <value>application/json;charset=UTF-8</value>
+            </list>
+        </property>
 
     </bean>
 

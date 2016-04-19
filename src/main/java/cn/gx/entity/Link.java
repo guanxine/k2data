@@ -4,9 +4,9 @@ package cn.gx.entity;
  * Created by guanxine on 16-4-16.
  */
 public class Link {
-
-    private String href;
     private Rel rel=Rel.self;
+    private String href;
+
 
     public Link() {
     }
@@ -14,6 +14,10 @@ public class Link {
     public Link(String href, Rel rel) {
         this.href = href;
         this.rel = rel;
+    }
+
+    public Link(String href) {
+        this.href=href;
     }
 
     public String getHref() {

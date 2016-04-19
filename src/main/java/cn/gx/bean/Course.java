@@ -1,5 +1,5 @@
 package cn.gx.bean;
-import cn.gx.util.Validable;
+
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.validation.constraints.NotNull;

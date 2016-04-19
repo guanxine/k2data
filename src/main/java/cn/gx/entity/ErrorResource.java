@@ -1,6 +1,6 @@
 package cn.gx.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import java.util.List;
 
@@ -8,7 +8,7 @@ import java.util.List;
  * Created by guanxine on 16-4-17.
  */
 
-@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonSerialize(include= JsonSerialize.Inclusion.NON_EMPTY)
 public class ErrorResource {
 
     private String code;
