@@ -30,7 +30,7 @@ public class CoursesServiceImpl implements CoursesService{
         for (int i = 0; i <size; i++) {
             Course course=courses.get(i);
             CourseView courseView = copyProps(course);
-            courseView.setLink(new Link(url+"/"+course.getId()));// 设置访问到该课程的请求，给客户端友好提示。
+            courseView.setLink(new Link(url+course.getId()));// 设置访问到该课程的请求，给客户端友好提示。
             courseViewsList.add(courseView);
         }
 

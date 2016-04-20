@@ -108,7 +108,7 @@
           <version>2.4</version>
           <configuration>
             <warSourceDirectory>src/main/webapp</warSourceDirectory>
-            <warName>k2DataCoursesRestService</warName>
+            <warName>k2data</warName>
             <failOnMissingWebXml>false</failOnMissingWebXml>
           </configuration>
         </plugin>
