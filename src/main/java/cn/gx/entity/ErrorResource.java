@@ -5,9 +5,8 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import java.util.List;
 
 /**
- * Created by guanxine on 16-4-17.
+ * 错误信息类
  */
-
 @JsonSerialize(include= JsonSerialize.Inclusion.NON_EMPTY)
 public class ErrorResource {
 

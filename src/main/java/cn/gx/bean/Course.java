@@ -7,27 +7,25 @@ import java.io.Serializable;
 import java.util.Date;
 
 /**
- * Created by always on 16/4/13.
- *
- * 持久化数据库的 课程实体类
+ * 课程类，对应数据库表 courses
  */
 public class Course implements Serializable{
 
 
-    private Integer id;
+    private Integer id;  // 课程编号
 
     @NotNull
-    private String name;
+    private String name; // 课程名
     @NotNull
     @DateTimeFormat(pattern ="yyyy-DD-mm")
-    private Date start;
+    private Date start;  // 课程开始日期
     @NotNull
     @DateTimeFormat(pattern ="yyyy-DD-mm")
-    private Date end;
+    private Date end;    // 课程结束日期
     @NotNull
-    private Integer estimatedTime;
+    private Integer estimatedTime; // 课时
     @NotNull
-    private String facilitator;
+    private String facilitator; // 讲师
 
 
     public Integer getId() {

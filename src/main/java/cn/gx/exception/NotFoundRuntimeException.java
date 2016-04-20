@@ -3,13 +3,13 @@ package cn.gx.exception;
 /**
  * Created by guanxine on 16-4-17.
  */
-public class NotFoundException extends RuntimeException{
+public class NotFoundRuntimeException extends RuntimeException{
 
-    public NotFoundException(String msg) {
+    public NotFoundRuntimeException(String msg) {
         super(msg);
     }
 
-    public NotFoundException(Integer id) {
+    public NotFoundRuntimeException(Integer id) {
         super(String.format("课程编号：%d 不存在.",id));
     }
 }

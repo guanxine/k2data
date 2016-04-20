@@ -3,18 +3,18 @@ package cn.gx.entity;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-/**
- * Created by guanxine on 16-4-19.
- */
 
+/**
+ *  API 类，显示 api 帮助信息的基础类
+ */
 @JsonSerialize(include= JsonSerialize.Inclusion.NON_EMPTY)
 public class API {
 
-    public String name;
-    public String url;
-    private RequestMethod method;
-    private String example;
-    private Object param;
+    public String name; // 操作名称
+    public String url;  // 请求路径
+    private RequestMethod method; //请求方式
+    private String example; //例子
+    private Object param; // 如果需要请求参数，指明请求参数
 
 
     public API() {

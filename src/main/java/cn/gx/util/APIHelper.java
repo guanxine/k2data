@@ -5,9 +5,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Created by guanxine on 16-4-19.
+ *  api 帮助类
  */
-
 public abstract class APIHelper {
 
     protected String url;

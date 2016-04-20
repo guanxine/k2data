@@ -4,7 +4,6 @@ import cn.gx.entity.ErrorResource;
 import cn.gx.entity.FieldErrorResource;
 import cn.gx.entity.Link;
 import cn.gx.entity.ResponsesWrapped;
-import cn.gx.util.CustomDateDeserializer;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,7 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by guanxine on 16-4-17.
+ * 全局异常处理类
  */
 @ControllerAdvice
 public class GlobalExceptionHandlingControllerAdvice{
@@ -43,15 +42,15 @@ public class GlobalExceptionHandlingControllerAdvice{
 
 
     /**
-     * Convert a predefined exception to an HTTP Status code and specify the
-     * name of a specific view that will be used to display the error.
+     * 处理数据库异常类
      *
-     * @return Exception view.
+     * @param exception
+     * @return
      */
     @ResponseStatus(value = HttpStatus.CONFLICT)
     @ExceptionHandler({ DataIntegrityViolationException.class,SQLException.class,DataAccessException.class})
     @ResponseBody
-    public ResponsesWrapped databaseError(Exception exception) {
+    public ResponsesWrapped handleDatabaseError(Exception exception) {
 
         ResponsesWrapped responsesWrapped=new ResponsesWrapped();
         responsesWrapped.setCode(HttpStatus.CONFLICT);
@@ -69,21 +68,12 @@ public class GlobalExceptionHandlingControllerAdvice{
         return responsesWrapped;
     }
 
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    @ExceptionHandler(Exception.class)
-    @ResponseBody ResponsesWrapped handleException(HttpServletRequest req, Exception ex) {
-        ResponsesWrapped responsesWrapped=new ResponsesWrapped();
-        responsesWrapped.setCode(HttpStatus.INTERNAL_SERVER_ERROR);
-        responsesWrapped.setStatus(ResponsesWrapped.Status.fail);
-        responsesWrapped.setMessage(ex.getLocalizedMessage());
-        responsesWrapped.setLink(new Link(req.getRequestURL().toString()));
-        logger.error("Request raised " + ex.getClass().getSimpleName());
 
-        return responsesWrapped;
-    }
-
-
-
+    /**
+     * 处理请求参数字段异常
+     * @param ex
+     * @return
+     */
     @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
     @ExceptionHandler({MethodArgumentNotValidException.class})
     @ResponseBody
@@ -112,10 +102,12 @@ public class GlobalExceptionHandlingControllerAdvice{
        return error;
     }
 
-
-    // json 格式错误
-    // 日期格式错了
-    //
+    /**
+     * 处理数据格式转换异常
+     * @param req
+     * @param ex
+     * @return
+     */
     @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
     @ExceptionHandler({HttpMessageNotReadableException.class,JsonMappingException.class})
     @ResponseBody
@@ -137,8 +129,14 @@ public class GlobalExceptionHandlingControllerAdvice{
         return responsesWrapped;
     }
 
+    /**
+     * 处理 找不到 相关异常
+     * @param req
+     * @param ex
+     * @return
+     */
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    @ExceptionHandler({NotFoundException.class,HttpRequestMethodNotSupportedException.class,NoHandlerFoundException.class})
+    @ExceptionHandler({NotFoundRuntimeException.class,HttpRequestMethodNotSupportedException.class,NoHandlerFoundException.class})
     @ResponseBody
     ResponsesWrapped handleBadRequest(HttpServletRequest req, Exception ex) {
 
@@ -148,6 +146,27 @@ public class GlobalExceptionHandlingControllerAdvice{
         responsesWrapped.setMessage(ex.getLocalizedMessage());
         responsesWrapped.setLink(new Link(req.getRequestURL().toString()));
         logger.error("Request raised " + ex.getClass().getSimpleName());
+        return responsesWrapped;
+    }
+
+
+    /**
+     *
+     * 处理其他异常
+     * @param req
+     * @param ex
+     * @return
+     */
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ExceptionHandler(Exception.class)
+    @ResponseBody ResponsesWrapped handleException(HttpServletRequest req, Exception ex) {
+        ResponsesWrapped responsesWrapped=new ResponsesWrapped();
+        responsesWrapped.setCode(HttpStatus.INTERNAL_SERVER_ERROR);
+        responsesWrapped.setStatus(ResponsesWrapped.Status.fail);
+        responsesWrapped.setMessage(ex.getLocalizedMessage());
+        responsesWrapped.setLink(new Link(req.getRequestURL().toString()));
+        logger.error("Request raised " + ex.getClass().getSimpleName());
+
         return responsesWrapped;
     }
 

@@ -8,17 +8,16 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import java.util.Date;
 
 /**
- * Created by always on 16/4/14.
+ * 课程时间类
  */
-//@FieldCompare(first = "start", second = "end", message = "start 应该小于 second")
 public class Time {
     @JsonDeserialize(using = CustomDateDeserializer.class)
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-    public Date start;
+    public Date start; //开始时间
 
     @JsonDeserialize(using = CustomDateDeserializer.class)
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-    public Date end;
+    public Date end;//结束时间
 
 
     public Date getStart() {
@@ -37,6 +36,10 @@ public class Time {
         this.end = end;
     }
 
+    /**
+     * 判断开始时间与结束时间是否有效
+     * @return true 有效，false 无效
+     */
     @JsonIgnore
     public boolean isVaild(){
 

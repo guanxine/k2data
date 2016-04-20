@@ -12,7 +12,7 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * Created by guanxine on 16-4-19.
+ *  与课程相关的课程帮助类。
  */
 public class CoursesAPIHelper extends APIHelper{
 

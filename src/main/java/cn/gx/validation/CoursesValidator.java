@@ -35,10 +35,9 @@ public class CoursesValidator implements Validator {
        // ValidationUtils.re
 
         ValidationUtils.rejectIfEmptyOrWhitespace(errors,"name","notnull","name 不能为空");
-        ValidationUtils.rejectIfEmptyOrWhitespace(errors,"time","not null","time 不能为空");
         ValidationUtils.rejectIfEmptyOrWhitespace(errors,"estimatedTime","not null","estimatedTime 不能为空");
         ValidationUtils.rejectIfEmptyOrWhitespace(errors,"facilitator","not null","facilitator 不能为空");
-
+        ValidationUtils.rejectIfEmptyOrWhitespace(errors,"time","not null","time 不能为空");
         CourseView cv=(CourseView)target;
         try {
             errors.pushNestedPath("time");

@@ -5,14 +5,14 @@ import cn.gx.bean.Course;
 import java.util.List;
 
 /**
- * Created by always on 16/4/14.
+ * 课程 Dao 接口，定义与数据库相关逻辑
  */
 public interface CoursesDao {
 
     /**
      * 查看课程列表
      *
-     * @return 返回所有课程集合,如果不存在,返回空集合
+     * @return 返回所有课程集合,如果不存在,抛自定义 NotFoundRuntimeException 运行时异常
      */
     List<Course> selectAll();
 
@@ -27,7 +27,7 @@ public interface CoursesDao {
      * 按 id 查询某一特定课程信息
      *
      * @param id
-     * @return 返回指定课程,如果不存在,返回 null
+     * @return 返回指定课程,如果不存在,抛自定义 NotFoundRuntimeException 运行时异常
      *
      */
     Course selectById(Integer id);

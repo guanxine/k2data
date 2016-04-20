@@ -1,10 +1,7 @@
 package cn.gx.exception;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.ResponseStatus;
-
 /**
- * Created by guanxine on 16-4-19.
+ * 自定义日期转换异常类
  */
 public class CustomDateRuntimeException extends RuntimeException {
 

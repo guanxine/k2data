@@ -4,41 +4,23 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.springframework.http.HttpStatus;
 
 /**
- * Created by guanxine on 16-4-16.
- *
- * Successful
- * {"code":200,"status":"success","data":
- * {"lacksTOS":false,"invalidCredentials":false,"authToken":"4ee683baa2a3332c3c86026d"}}
- *
- * Error
- * {"code":401,"status":"error","message":"token is invalid","data":"UnauthorizedException"}
- *
+ * 返回客户端信息实体类
  */
 @JsonSerialize(include= JsonSerialize.Inclusion.NON_EMPTY)
 public class ResponsesWrapped {
 
-    /**
-     * 响应的值 信息
-     * success:
-     * fail:500~599
-     * error:400~499
-     */
-    private Status status;
+    private Status status;// 状态信息
 
 
     public enum Status{
         success,fail,error
     }
-    /**
-     * 响应状态码
-     */
-    private HttpStatus code;
-    /**
-     *  only used for “fail” and “error” statuses to contain the error message
-     */
-    private String message;
 
-    private Link link;
+    private HttpStatus code;//响应状态码信息
+
+    private String message;// 状态详细信息
+
+    private Link link; // 资源链接
 
 
     public HttpStatus getCode() {

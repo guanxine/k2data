@@ -14,14 +14,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by guanxine on 16-4-19.
+ *  API 控制类
+ *
  */
 @RestController
-@RequestMapping("/api")
 public class APIController {
 
 
-    @RequestMapping(method = RequestMethod.GET,produces = MediaType.APPLICATION_JSON_VALUE)
+    /**
+     * 显示所有 restful api 信息。
+     * @param request
+     * @return
+     */
+    @RequestMapping(value = "/api",method = RequestMethod.GET,produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity helpAPI(HttpServletRequest request){
 
         String url = request.getRequestURL().toString();

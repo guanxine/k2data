@@ -1,0 +1,4 @@
+FROM ehazlett/tomcat7
+COPY k2data /opt/tomcat/webapps/k2data
+COPY dbtest /opt/tomcat/webapps/dbtest
+

@@ -1,7 +1,7 @@
 package cn.gx.entity;
 
 /**
- * Created by guanxine on 16-4-16.
+ * 资源链接类
  */
 public class Link {
     private Rel rel=Rel.self;

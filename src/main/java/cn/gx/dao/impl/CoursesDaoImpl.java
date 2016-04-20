@@ -2,7 +2,7 @@ package cn.gx.dao.impl;
 
 import cn.gx.bean.Course;
 import cn.gx.dao.CoursesDao;
-import cn.gx.exception.NotFoundException;
+import cn.gx.exception.NotFoundRuntimeException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
@@ -11,14 +11,12 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
-import javax.annotation.Resource;
 import javax.sql.DataSource;
 import java.sql.*;
-import java.util.Collections;
 import java.util.List;
 
 /**
- * Created by always on 16/4/14.
+ * 课程 Dao 类，实现与数据库相关逻辑
  */
 @Repository("coursesDao")
 public class CoursesDaoImpl implements CoursesDao{
@@ -37,7 +35,7 @@ public class CoursesDaoImpl implements CoursesDao{
         List<Course> courses = jdbcTemplate.query(sql, courseRowMapper);
 
         if (courses==null || courses.isEmpty()){
-            throw new NotFoundException("课程列表为空");
+            throw new NotFoundRuntimeException("课程列表为空");
         }else{
             return courses;
         }
@@ -53,7 +51,7 @@ public class CoursesDaoImpl implements CoursesDao{
         String sql="SELECT ID,NAME,START,END,ESTIMATEDTIME,FACILITATOR FROM courses WHERE ID=?";
         List<Course> courses = jdbcTemplate.query(sql, courseRowMapper, id);
         if (courses==null||courses.isEmpty()){
-            throw new NotFoundException(id);
+            throw new NotFoundRuntimeException(id);
         }else{
             return courses.get(0);
         }

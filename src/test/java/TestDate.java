@@ -13,9 +13,9 @@ import java.util.TimeZone;
 /**
  * Created by guanxine on 16-4-19.
  */
-public class Tets {
+public class TestDate {
 
-    @Test
+    @org.junit.Test
     public void testDate() throws ParseException, JsonProcessingException {
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
 
@@ -38,7 +38,7 @@ public class Tets {
         System.out.println(s);
     }
 
-    @Test
+    @org.junit.Test
     public void testStr2Date() throws IOException {
         String timeStr="{\"start\":\"2016-12-14\",\"end\":\"20160102\"}";
 

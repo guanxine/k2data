@@ -3,22 +3,16 @@ package cn.gx.entity;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 /**
- * Created by always on 16/4/14.
  *
  * 返回给客户端的课程信息
  */
 @JsonSerialize(include= JsonSerialize.Inclusion.NON_EMPTY)
 public class CourseView {
 
-//    @NotBlank(message = "课程名称不能为空")
     private String name;
-//    @NotNull(message="课程时间不能为空")
     private Time time;
-//    @NotNull
     private Integer estimatedTime;
-//    @NotNull
     private String facilitator;
-
     private Link link;
 
     public String getName() {

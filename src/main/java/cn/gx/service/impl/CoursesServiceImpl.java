@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by always on 16/4/14.
+ * 课程业务类，实现与课程相关的逻辑
  */
 @Service("coursesService")
 public class CoursesServiceImpl implements CoursesService{
@@ -30,9 +30,7 @@ public class CoursesServiceImpl implements CoursesService{
         for (int i = 0; i <size; i++) {
             Course course=courses.get(i);
             CourseView courseView = copyProps(course);
-            Link self=new Link();
-            self.setHref(url+"/"+course.getId());
-            courseView.setLink(self);
+            courseView.setLink(new Link(url+"/"+course.getId()));// 设置访问到该课程的请求，给客户端友好提示。
             courseViewsList.add(courseView);
         }
 
@@ -47,11 +45,39 @@ public class CoursesServiceImpl implements CoursesService{
     public CourseView findById(Integer id,String url) {
         Course course = coursesDao.selectById(id);
         CourseView courseView = copyProps(course);
-        courseView.setLink(new Link(url));
+        courseView.setLink(new Link(url));// 设置访问到该课程的请求，给客户端友好提示。
         return courseView;
     }
 
 
+
+    public Course saveCourse(CourseView courseView){
+
+        Course course = copyProps(courseView);
+        return coursesDao.save(course);
+    }
+
+    /**
+     * 客户端 CourseView 实体类到数据库实体 Course 类的转换。
+     * @param courseView
+     * @return Course
+     */
+    private Course copyProps(CourseView courseView) {
+        Time time = courseView.getTime();
+        Course course=new Course();
+        course.setName(courseView.getName());
+        course.setStart(time.getStart());
+        course.setEnd(time.getEnd());
+        course.setFacilitator(courseView.getFacilitator());
+        course.setEstimatedTime(courseView.getEstimatedTime());
+        return course;
+    }
+
+    /**
+     * 数据库实体 Course 类到客户端CourseView 实体类的转换。
+     * @param course
+     * @return CourseView
+     */
     private CourseView copyProps(Course course) {
 
         Time time=new Time();
@@ -65,17 +91,4 @@ public class CoursesServiceImpl implements CoursesService{
         courseView.setTime(time);
         return courseView;
     }
-
-    public Course saveCourse(CourseView courseView) throws RuntimeException{
-
-        Time time = courseView.getTime();
-        Course course=new Course();
-        course.setName(courseView.getName());
-        course.setStart(time.getStart());
-        course.setEnd(time.getEnd());
-        course.setFacilitator(courseView.getFacilitator());
-        course.setEstimatedTime(courseView.getEstimatedTime());
-        return coursesDao.save(course);
-    }
-
 }
